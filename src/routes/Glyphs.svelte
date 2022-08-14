@@ -2,8 +2,8 @@
   import { link, querystring } from "svelte-spa-router";
   import { onMount } from "svelte";
 
-  import { fontDownloadURL } from "@/helper/download";
-  import { getGlyphs } from "@/helper/views";
+  import { fontDownloadCss } from "@/helper/download";
+  import { getGlyphs, getGlyphsByFont } from "@/helper/views";
   import Load from "@/components/Load.svelte";
   import Glyph from "@/components/Glyph.svelte";
 
@@ -15,12 +15,14 @@
   let chars: HTMLDivElement;
   let mounted = false;
   let glyphs = [] as string[];
+  let customGlyphs = [] as string[];
+  let customUnicodes = "";
   let fontUrl = "";
   let loaded = false;
 
   const loadFont = (fontFamily: string) => {
     chars.style.fontFamily = fontFamily;
-    glyphs = getGlyphs(fontFamily);
+    glyphs = getGlyphsByFont(fontFamily);
   };
 
   const triggerLoad = (l: boolean, m: boolean) => {
@@ -32,15 +34,30 @@
 
   const queryCheck = async (font: string, qString: string) => {
     const searchParams = new URLSearchParams(qString);
-    const url = searchParams.get("url") ?? "";
+    const css = searchParams.get("css") ?? "";
 
     try {
-      fontUrl = fontDownloadURL(font, url);
+      fontUrl = fontDownloadCss(font, css);
     } catch (err) {
       error = err;
     }
   };
 
+  const customView = (unicodes: string) => {
+    unicodes = unicodes.replaceAll(" ", "");
+    if (unicodes == "") {
+      customGlyphs = [];
+      return;
+    }
+
+    try {
+      customGlyphs = getGlyphs(unicodes.split(","));
+    } catch (error) {
+      customGlyphs = [];
+    }
+  };
+
+  $: customView(customUnicodes);
   $: queryCheck(params.font, $querystring);
   $: triggerLoad(loaded, mounted);
 
@@ -68,7 +85,7 @@
       class="text-indigo-500 border-r border-r-black hover:text-red-500 pr-2"
       >Home</a
     >
-    <span>Total glyphs is {glyphs.length}</span>
+    <span>{glyphs.length} total glyphs</span>
   </div>
   <span>{params.font}</span>
 </div>
@@ -80,6 +97,33 @@
     {error}
   </div>
 {/if}
+
+<div class="mb-2 p-2">
+  <details>
+    <summary>Custom Unicode Range</summary>
+    <label>
+      <span class="text-sm font-bold block mb-2">Unicodes</span>
+      <input
+        type="text"
+        name="unicodes"
+        autocomplete="off"
+        placeholder="U+10C00-10C48, U+0000-00FF, U+0131"
+        class="mb-4 form-input p-1"
+        bind:value={customUnicodes}
+      />
+    </label>
+
+    <div
+      class="bg-white w-full text-5xl text-center h-full flex flex-wrap justify-center gap-1"
+    >
+      {#each customGlyphs as glyph, i}
+        <Glyph {glyph} />
+      {/each}
+    </div>
+  </details>
+</div>
+
+<hr class="w-full h-1 bg-indigo-500 mb-2" />
 
 <div
   bind:this={chars}

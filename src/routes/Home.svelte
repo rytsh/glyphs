@@ -13,13 +13,13 @@
     const form = e.currentTarget;
     const fontNameFrom = (form.elements.namedItem("font") as HTMLInputElement)
       .value;
-    const fontURLForm = (
-      form.elements.namedItem("font-url") as HTMLInputElement
+    const fontCssForm = (
+      form.elements.namedItem("css-link") as HTMLInputElement
     ).value;
 
     let redirectURL = `/fonts/${fontNameFrom}`;
-    if (fontURLForm) {
-      redirectURL += `?url=${fontURLForm}`;
+    if (fontCssForm) {
+      redirectURL += `?css=${fontCssForm}`;
     }
 
     push(redirectURL);
@@ -29,9 +29,9 @@
 </script>
 
 <div
-  class="p-4 flex justify-evenly border-b-4 border-t-4 border-indigo-500 flex-wrap gap-5"
+  class="p-4 flex justify-evenly border-b-4 border-t-4 border-indigo-500 flex-wrap gap-5 flex-col sm:flex-row"
 >
-  <div class="flex items-center">
+  <div class="flex items-center justify-center">
     <span class="font-mono text-6xl">Glyphs</span>
   </div>
   <form on:submit|preventDefault|stopPropagation={submitForm}>
@@ -41,17 +41,17 @@
         type="text"
         name="font"
         autocomplete="off"
-        placeholder="Noto Sans"
+        placeholder="Noto Emoji"
         class="mb-4 form-input p-1"
       />
     </label>
     <label>
-      <span class="text-sm font-bold block mb-2">URL</span>
+      <span class="text-sm font-bold block mb-2">Stylesheet Link</span>
       <input
         type="text"
-        name="font-url"
+        name="css-link"
         autocomplete="off"
-        placeholder="Optional custom URL"
+        placeholder="Optional custom stylesheet"
         class="mb-4 form-input p-1"
       />
     </label>

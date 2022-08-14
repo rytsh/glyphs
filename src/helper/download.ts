@@ -1,5 +1,5 @@
-const fontDownloadURL = (font: string, url = "") => {
-  let fontURL = url;
+const fontDownloadCss = (font: string, css = "") => {
+  let fontURL = css;
 
   if (fontURL == "") {
     // https://fonts.googleapis.com/css2?family=Noto+Sans+Old+Turkic&display=swap
@@ -44,4 +44,4 @@ const loadStyle = (src: string) => {
   });
 };
 
-export { fontDownloadURL, loadStyle };
+export { fontDownloadCss, loadStyle };

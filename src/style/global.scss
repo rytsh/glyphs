@@ -7,3 +7,12 @@ html,
 body {
   @apply h-full w-full;
 }
+
+::selection {
+  @apply bg-red-500 text-white;
+}
+
+/* stylelint-disable max-line-length */
+.form-input {
+  @apply border-2 border-gray-200 bg-gray-100 py-1 px-2 appearance-none w-full leading-tight focus:outline-none focus:bg-white focus:border-red-300;
+}

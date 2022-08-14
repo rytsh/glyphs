@@ -15,17 +15,20 @@ const unicodeRange = (fontFamily: string) => {
   throw new Error("Font not found");
 };
 
-const getGlyphs = (fontFamily: string) => {
-  const glyphs: string[] = [];
+const getGlyphsByFont = (fontFamily: string) => {
   const range = unicodeRange(fontFamily);
 
+  return getGlyphs(range);
+};
+
+const getGlyphs = (range: string[]) => {
+  const glyphs: string[] = [];
+
   UnicodeRange.parse(range).forEach((i) => {
-    // console.log(i.toString(16));
     glyphs.push(String.fromCodePoint(i));
   });
 
   return glyphs;
 };
 
-
-export { getGlyphs };
+export { getGlyphsByFont, getGlyphs };
