@@ -2,9 +2,8 @@
   import { link, querystring } from "svelte-spa-router";
   import { onMount } from "svelte";
 
-  import { fontDownloadCss } from "@/helper/download";
+  import { fontDownloadCss, fontDownloadFile } from "@/helper/download";
   import { getGlyphs, getGlyphsByFont } from "@/helper/views";
-  import Load from "@/components/Load.svelte";
   import Glyph from "@/components/Glyph.svelte";
 
   export let params = {} as {
@@ -12,35 +11,68 @@
   };
 
   let error = "";
-  let chars: HTMLDivElement;
+  let divListGlyphs: HTMLDivElement;
+  let divListGlyphsCustom: HTMLDivElement;
   let mounted = false;
   let glyphs = [] as string[];
   let customGlyphs = [] as string[];
   let customUnicodes = "";
-  let fontUrl = "";
-  let loaded = false;
+
+  let qStringOld = "";
+  let fontOld = "";
+
+  const changeFont = (fontFamily: string, mounted: boolean) => {
+    if (!mounted) {
+      return;
+    }
+
+    divListGlyphs.style.fontFamily = `'${fontFamily}'`;
+    divListGlyphsCustom.style.fontFamily = `'${fontFamily}'`;
+  };
 
   const loadFont = (fontFamily: string) => {
-    chars.style.fontFamily = fontFamily;
+    // set font types
     glyphs = getGlyphsByFont(fontFamily);
   };
 
-  const triggerLoad = (l: boolean, m: boolean) => {
-    if (l && m) {
-      loaded = false;
-      loadFont(params.font);
-    }
-  };
-
   const queryCheck = async (font: string, qString: string) => {
+    const qStringOldCheck = qStringOld;
+    qStringOld = qString;
+
+    const fontOldCheck = fontOld;
+    fontOld = font;
+
+    if (fontOldCheck != "") {
+      if (qString == "" && qStringOldCheck != "") {
+        return;
+      }
+
+      if (qStringOldCheck != qString && fontOldCheck == font) {
+        return;
+      }
+    }
+
+    error = "";
+
     const searchParams = new URLSearchParams(qString);
     const css = searchParams.get("css") ?? "";
+    const file = searchParams.get("file") ?? "";
 
-    try {
-      fontUrl = fontDownloadCss(font, css);
-    } catch (err) {
-      error = err;
+    if (file == "") {
+      fontDownloadCss(font, css)
+        .then(() => loadFont(font))
+        .catch((e) => {
+          error = e;
+        });
+
+      return;
     }
+
+    fontDownloadFile(font, file)
+      .then(() => loadFont(font))
+      .catch((e) => {
+        error = e;
+      });
   };
 
   const customView = (unicodes: string) => {
@@ -59,21 +91,12 @@
 
   $: customView(customUnicodes);
   $: queryCheck(params.font, $querystring);
-  $: triggerLoad(loaded, mounted);
+  $: changeFont(params.font, mounted);
 
   onMount(() => {
     mounted = true;
   });
 </script>
-
-<Load
-  {fontUrl}
-  load={() => {
-    loaded = true;
-    error = "";
-  }}
-  error={(err) => (error = err)}
-/>
 
 <div
   class="text-2xl p-2 bg-white border-b-2 border-indigo-500 mb-4 flex justify-between"
@@ -100,7 +123,9 @@
 
 <div class="mb-2 p-2">
   <details>
-    <summary>Custom Unicode Range</summary>
+    <summary class="cursor-pointer hover:bg-yellow-200"
+      >Custom Unicode Range</summary
+    >
     <label>
       <span class="text-sm font-bold block mb-2">Unicodes</span>
       <input
@@ -113,11 +138,9 @@
       />
     </label>
 
-    <div
-      class="bg-white w-full text-5xl text-center h-full flex flex-wrap justify-center gap-1"
-    >
+    <div bind:this={divListGlyphsCustom} class="glyphs-list">
       {#each customGlyphs as glyph, i}
-        <Glyph {glyph} />
+        <Glyph {glyph} class="glyphs" />
       {/each}
     </div>
   </details>
@@ -125,11 +148,8 @@
 
 <hr class="w-full h-1 bg-indigo-500 mb-2" />
 
-<div
-  bind:this={chars}
-  class="bg-white w-full text-5xl text-center h-full flex flex-wrap justify-center gap-1"
->
+<div bind:this={divListGlyphs} class="glyphs-list">
   {#each glyphs as glyph, i}
-    <Glyph {glyph} />
+    <Glyph {glyph} class="glyphs" />
   {/each}
 </div>

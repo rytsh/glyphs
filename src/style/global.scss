@@ -14,5 +14,26 @@ body {
 
 /* stylelint-disable max-line-length */
 .form-input {
-  @apply border-2 border-gray-200 bg-gray-100 py-1 px-2 appearance-none w-full leading-tight focus:outline-none focus:bg-white focus:border-red-300;
+  @apply border-2 border-gray-200 bg-white py-1 px-2 appearance-none w-full leading-tight focus:outline-none focus:border-red-300;
+}
+
+.form-input-example {
+  @apply float-right border-2 border-gray-200 bg-white ml-1 px-2 appearance-none leading-tight focus:outline-none focus:border-red-300;
+}
+
+.example-box {
+  &:hover {
+    box-shadow: 4px 4px 0 0 rgb(0 0 0 / 100%);
+  }
+}
+
+.glyphs-list {
+  @apply bg-white w-full text-5xl text-center grid gap-[1px] list-none relative;
+
+  grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+  padding: 0 1px 1px;
+}
+
+.glyphs {
+  @apply items-center justify-center outline outline-1 outline-black h-16 cursor-pointer leading-tight;
 }

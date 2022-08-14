@@ -2,12 +2,17 @@
   export let glyph = "";
 
   let copied = false;
+
+  let className = "";
+  export { className as class };
 </script>
 
-<span
+<button
   class={`${
-    copied ? "hover:bg-green-500" : "hover:bg-yellow-200"
-  } border border-black p-2 w-20 h-20 cursor-pointer leading-tight`}
+    copied
+      ? "!bg-green-500 text-white hover:!bg-green-500"
+      : "hover:!bg-yellow-200"
+  } ${className} focus:outline-4 focus:outline-indigo-500 focus:bg-yellow-100 focus:z-10`}
   title="click to copy clipboard"
   on:click={() => {
     copied = true;
@@ -18,4 +23,4 @@
   }}
 >
   {glyph}
-</span>
+</button>

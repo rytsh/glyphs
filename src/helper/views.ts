@@ -4,6 +4,11 @@ const unicodeRange = (fontFamily: string) => {
   const range = [] as string[];
   for (const f of document.fonts.values()) {
     if (f.family == fontFamily) {
+      if (f.unicodeRange == "U+0-10FFFF") {
+        range.push("U+0020-00FF");
+        continue;
+      }
+
       range.push(f.unicodeRange);
     }
   }
@@ -25,7 +30,8 @@ const getGlyphs = (range: string[]) => {
   const glyphs: string[] = [];
 
   UnicodeRange.parse(range).forEach((i) => {
-    glyphs.push(String.fromCodePoint(i));
+    const v = String.fromCodePoint(i);
+    if (v) glyphs.push(v);
   });
 
   return glyphs;
